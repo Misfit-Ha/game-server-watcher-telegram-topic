@@ -103,8 +103,19 @@ class ServerInfoMessage {
     async init(msgId?: number) {
         if (msgId) this.messageId = msgId;
         else {
-            const msg = await bot.api.sendMessage(this.chatId, 'Initializing server info...');
-            this.messageId = msg.message_id;
+            const {chatId, messageThreadId} = this.extractChatIdAndThreadId(
+                this.chatId
+            )
+            const options: any = {parse_mode: 'Markdown'}
+            if (messageThreadId !== undefined) {
+                options.message_thread_id = messageThreadId
+            }
+            const msg = await bot.api.sendMessage(
+                chatId,
+                'Initializing server info...',
+                options
+            )
+            this.messageId = msg.message_id
         }
 
         if (db.data && this.messageId) {
@@ -165,9 +176,22 @@ class ServerInfoMessage {
         infoText += chart;
 
         try {
-            await bot.api.editMessageText(this.chatId, this.messageId, infoText, { parse_mode: 'Markdown' });
+            const {chatId} = this.extractChatIdAndThreadId(
+                this.chatId
+            )
+            await bot.api.editMessageText(chatId, this.messageId, infoText, {
+                parse_mode: 'Markdown',
+            })
         } catch (e: any) {
             console.error(['telegram.up', this.chatId, this.host, this.port].join(':'), e.message || e);
+        }
+    }
+
+    extractChatIdAndThreadId(chatId: string) {
+        const parts = chatId.split('_')
+        return {
+            chatId: parts[0],
+            messageThreadId: parts[1] ? parseInt(parts[1], 10) : undefined,
         }
     }
 
