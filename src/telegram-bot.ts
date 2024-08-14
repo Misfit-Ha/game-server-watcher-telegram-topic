@@ -211,7 +211,7 @@ class ServerInfoMessage {
                     infoText +=
                         '```\n' +
                         pnArr
-                            .join('\n')
+                            .join('\n\n')
                             .slice(0, 4088 - infoText.length - chart.length) +
                         '\n```' // Note: max length 4096 - wrapper
                 }
