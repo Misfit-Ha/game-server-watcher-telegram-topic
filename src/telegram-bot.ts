@@ -184,7 +184,6 @@ class ServerInfoMessage {
                 this.escapeMarkdown(gs.config.name) + '\n',
                 this.escapeMarkdown(gs.niceName) + '\n',
                 this.escapeMarkdown(gs.info.game) +
-                    '\n' +
                     (gs.info.map != ''
                         ? ` / ${this.escapeMarkdown(gs.info.map)}`
                         : '') +
