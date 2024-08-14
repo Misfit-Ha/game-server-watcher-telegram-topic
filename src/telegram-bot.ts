@@ -183,11 +183,10 @@ class ServerInfoMessage {
             infoText = [
                 this.escapeMarkdown(gs.config.name) + '\n',
                 this.escapeMarkdown(gs.niceName) + '\n',
-                this.escapeMarkdown(gs.info.game) +
-                    '\n' +
-                    ' / ' +
-                    this.escapeMarkdown(gs.info.map) +
-                    '\n',
+                this.escapeMarkdown(gs.info.game) + '\n' + gs.info.map
+                    ? ` / ${this.escapeMarkdown(gs.info.map)}`
+                    : '',
+                '\n',
                 this.escapeMarkdown(gs.info.connect) + '\n',
                 'Players ' + gs.info.playersNum + '/' + gs.info.playersMax,
             ].join('\n')
