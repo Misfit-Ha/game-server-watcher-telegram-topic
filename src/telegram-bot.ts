@@ -189,7 +189,7 @@ class ServerInfoMessage {
                         : '') +
                     '\n',
 
-                this.escapeMarkdown(gs.info.connect) + '\n',
+                this.escapeMarkdown('IP: ' + gs.info.connect) + '\n',
                 'Players ' + gs.info.playersNum + '/' + gs.info.playersMax,
             ].join('\n')
 
