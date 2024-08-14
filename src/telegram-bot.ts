@@ -181,12 +181,14 @@ class ServerInfoMessage {
             console.log(gs.niceName)
 
             infoText = [
-                this.escapeMarkdown(gs.config.name),
-                this.escapeMarkdown(gs.niceName),
+                this.escapeMarkdown(gs.config.name) + '\n',
+                this.escapeMarkdown(gs.niceName) + '\n',
                 this.escapeMarkdown(gs.info.game) +
+                    '\n' +
                     ' / ' +
-                    this.escapeMarkdown(gs.info.map),
-                this.escapeMarkdown(gs.info.connect),
+                    this.escapeMarkdown(gs.info.map) +
+                    '\n',
+                this.escapeMarkdown(gs.info.connect) + '\n',
                 'Players ' + gs.info.playersNum + '/' + gs.info.playersMax,
             ].join('\n')
 
@@ -209,7 +211,7 @@ class ServerInfoMessage {
 
                 if (pnArr.length > 0) {
                     infoText +=
-                        '```\n\n' +
+                        '```\n' +
                         pnArr
                             .join('\n')
                             .slice(0, 4088 - infoText.length - chart.length) +
