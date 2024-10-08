@@ -172,70 +172,83 @@ class ServerInfoMessage {
     async updatePost(gs: GameServer, conf: TelegramConfig) {
         const showPlayersList = Boolean(conf.showPlayersList)
         const showGraph = Boolean(conf.showGraph)
-
+    
         const chart = showGraph ? '[📈](' + gs.history.statsChart() + ')' : ''
-        let infoText = this.escapeMarkdown(gs.niceName) + ' offline...'
-
+        let infoText = `*${this.escapeMarkdown(gs.niceName)}* 🔴 Offline...\n\n`
+    
         if (gs.info && gs.online) {
-            console.log(gs)
-            console.log(gs.niceName)
-
-            infoText = [
-                this.escapeMarkdown(gs.config.name) + '\n',
-                this.escapeMarkdown(gs.niceName) + '\n',
-                this.escapeMarkdown(gs.info.game) +
-                    (gs.info.map != ''
-                        ? ` / ${this.escapeMarkdown(gs.info.map)}`
-                        : '') +
-                    '\n',
-
-                this.escapeMarkdown('IP: ' + gs.info.connect) + '\n',
-                'Players ' + gs.info.playersNum + '/' + gs.info.playersMax,
-            ].join('\n')
-
-            if (gs.config.infoText)
-                infoText +=
-                    'Info:\n' + String(gs.config.infoText).slice(0, 1024) + '\n'
-
-            if (showPlayersList && gs.info.players.length > 0) {
-                const pnArr: string[] = []
-                for (const p of gs.info.players) {
-                    let playerLine = ''
-                    if (p.get('time') !== undefined)
-                        playerLine += hhmmss(p.get('time') || '0') + ' '
-                    if (p.get('name') !== undefined)
-                        playerLine += p.get('name') || 'n/a'
-                    if (p.get('score') !== undefined)
-                        playerLine += ' (' + (p.get('score') || 0) + ')'
-                    pnArr.push(playerLine)
-                }
-
-                if (pnArr.length > 0) {
-                    infoText +=
-                        '```\n' +
-                        pnArr
-                            .join('\n')
-                            .slice(0, 4088 - infoText.length - chart.length) +
-                        '\n```' // Note: max length 4096 - wrapper
-                }
+          infoText = [
+            `🖥 *${this.escapeMarkdown(gs.config.name)}*\n`,
+            `📡 *${this.escapeMarkdown(gs.niceName)}*\n`,
+            `🎮 *${this.escapeMarkdown(gs.info.game)}*` +
+              (gs.info.map != ''
+                ? ` / 🗺 _${this.escapeMarkdown(gs.info.map)}_`
+                : '') +
+              '\n',
+            `🌐 \`${this.escapeMarkdown(gs.info.connect)}\`\n`,
+            `👥 Players: *${gs.info.playersNum}/${gs.info.playersMax}*\n`,
+          ].join('\n')
+    
+          if (gs.config.infoText)
+            infoText +=
+              '\n📌 *Info:*\n' + 
+              this.escapeMarkdown(String(gs.config.infoText).slice(0, 1024)) + 
+              '\n\n'
+    
+          if (showPlayersList && gs.info.players.length > 0) {
+            const pnArr: string[] = []
+            for (const p of gs.info.players) {
+              let playerLine = ''
+              if (p.get('time') !== undefined)
+                playerLine += '⏱ ' + hhmmss(p.get('time') || '0') + ' '
+              if (p.get('name') !== undefined)
+                playerLine += '👤 ' + this.escapeMarkdown(p.get('name') || 'n/a')
+              if (p.get('score') !== undefined)
+                playerLine += ' 🏆 ' + (p.get('score') || 0)
+              pnArr.push(playerLine)
             }
+    
+            if (pnArr.length > 0) {
+              infoText +=
+                '*Player List:*\n```\n' +
+                pnArr
+                  .join('\n')
+                  .slice(0, 4088 - infoText.length - chart.length) +
+                '\n```\n\n'
+            }
+          }
         }
-
+    
         infoText += chart
-
+    
+        // Add the last updated date and time in Iran timezone
+        const now = new Date()
+        const iranTime = new Intl.DateTimeFormat('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Tehran'
+        }).format(now)
+    
+        infoText += `\n🕒 *Last updated:* _${iranTime}_`
+    
         try {
-            const {chatId} = this.extractChatIdAndThreadId(this.chatId)
-            await bot.api.editMessageText(chatId, this.messageId, infoText, {
-                parse_mode: 'Markdown',
-            })
+          const {chatId} = this.extractChatIdAndThreadId(this.chatId)
+          await bot.api.editMessageText(chatId, this.messageId, infoText, {
+            parse_mode: 'Markdown',
+          })
         } catch (e: any) {
-            console.error(
-                ['telegram.up', this.chatId, this.host, this.port].join(':'),
-                e.message || e
-            )
+          console.error(
+            ['telegram.up', this.chatId, this.host, this.port].join(':'),
+            e.message || e
+          )
         }
-    }
-
+      }
+      
     extractChatIdAndThreadId(chatId: string) {
         const parts = chatId.split('_')
         return {
