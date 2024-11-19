@@ -174,8 +174,8 @@ class ServerInfoMessage {
         const showGraph = Boolean(conf.showGraph)
     
         const chart = showGraph ? '[📈](' + gs.history.statsChart() + ')' : ''
-        let infoText = `*${this.escapeMarkdown(gs.niceName)}* 🔴 Offline...\n\n`
-    
+        let infoText = `*${this.escapeMarkdown(gs.niceName)}* 🔴 Offline\\.\\.\\.\n\n`
+
         if (gs.info && gs.online) {
           infoText = [
             `🖥 *${this.escapeMarkdown(gs.config.name)}*\n`,
@@ -239,7 +239,7 @@ class ServerInfoMessage {
         try {
           const {chatId} = this.extractChatIdAndThreadId(this.chatId)
           await bot.api.editMessageText(chatId, this.messageId, infoText, {
-            parse_mode: 'Markdown',
+            parse_mode: 'MarkdownV2',
           })
         } catch (e: any) {
           console.error(
@@ -266,5 +266,5 @@ class ServerInfoMessage {
         }
         
         return escapedStr;
-      }
+    }
 }
