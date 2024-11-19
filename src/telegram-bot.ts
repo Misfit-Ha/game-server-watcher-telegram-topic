@@ -239,7 +239,7 @@ class ServerInfoMessage {
         try {
           const {chatId} = this.extractChatIdAndThreadId(this.chatId)
           await bot.api.editMessageText(chatId, this.messageId, infoText, {
-            parse_mode: 'Markdown',
+            parse_mode: 'MarkdownV2',
           })
         } catch (e: any) {
           console.error(
@@ -258,11 +258,6 @@ class ServerInfoMessage {
     }
 
     escapeMarkdown(str: string): string {
-        const patterns = [/_/g, /~/g, /`/g, /</g, />/g]
-
-        return patterns.reduce(
-            (acc: string, pattern: RegExp) => acc.replace(pattern, '\\$&'),
-            str
-        )
+        return str.replace(/([_*\[\]()~`>#+-=|{}.!])/g, '\\$1');
     }
 }
